@@ -1,5 +1,6 @@
 // taskpane.js
 
+// Ensure Office is ready before doing anything
 Office.onReady(info => {
     // Log host info for debugging
     console.log("Office.onReady Info:", info);
@@ -15,15 +16,15 @@ Office.onReady(info => {
     }
 });
 
-const SNIPPETS_KEY = 'cw_snippets_v1';
+const SNIPPETS_KEY = 'cw_snippets_v1'; // Prefix to avoid potential collisions
 
-// --- DOM References --- Add new ones
-let snippetForm, commandInput, descriptionInput, textInput, saveButton, snippetListContainer, formMessage, listMessage, formTitle, editOriginalCommandInput, cancelEditButton, btnAddNewline, btnAddPlaceholder, toggleFormButton, searchInput, formSection; // <-- Added toggleFormButton, searchInput, formSection
+// --- DOM References ---
+let snippetForm, commandInput, descriptionInput, textInput, saveButton, snippetListContainer, formMessage, listMessage, formTitle, editOriginalCommandInput, cancelEditButton, btnAddNewline, btnAddPlaceholder, toggleFormButton, searchInput, formSection;
 
-let currentSnippets = [];
+let currentSnippets = []; // Cache snippets locally
 
 function initializeAddin() {
-    // Get DOM references
+    // Get DOM references after Office is ready and DOM is loaded
     snippetForm = document.getElementById('snippet-form');
     commandInput = document.getElementById('command');
     descriptionInput = document.getElementById('description');
@@ -37,7 +38,6 @@ function initializeAddin() {
     cancelEditButton = document.getElementById('cancel-edit-button');
     btnAddNewline = document.getElementById('btn-add-newline');
     btnAddPlaceholder = document.getElementById('btn-add-placeholder');
-    // --- New References ---
     toggleFormButton = document.getElementById('toggle-form-btn');
     searchInput = document.getElementById('search-snippets');
     formSection = document.querySelector('.form-section'); // Get the section itself
@@ -56,9 +56,11 @@ function initializeAddin() {
     loadSnippetsFromSettings();
 }
 
-// --- Storage Functions (Unchanged) ---
+// --- Storage Functions ---
+
 async function loadDefaultSnippets() {
     try {
+        // Assuming snippets.json is in an 'assets' folder relative to the taskpane folder
         const response = await fetch('../assets/snippets.json');
         if (!response.ok) {
             throw new Error(`HTTP error loading defaults: ${response.status}`);
@@ -69,7 +71,7 @@ async function loadDefaultSnippets() {
     } catch (error) {
         console.error("Failed to load default snippets:", error);
         showMessage(listMessage, "Error loading default snippets.", true);
-        return [];
+        return []; // Return empty array on failure
     }
 }
 
@@ -80,7 +82,7 @@ function loadSnippetsFromSettings() {
         return;
     }
     setMessage(snippetListContainer, '<p class="status-message">Loading snippets...</p>');
-    Office.context.roamingSettings.remove(SNIPPETS_KEY + '_error_flag');
+    Office.context.roamingSettings.remove(SNIPPETS_KEY + '_error_flag'); // Clear previous errors
 
     const storedSnippets = Office.context.roamingSettings.get(SNIPPETS_KEY);
 
@@ -92,14 +94,16 @@ function loadSnippetsFromSettings() {
         } catch (e) {
             console.error("Error parsing snippets from settings:", e);
             showMessage(listMessage, "Error loading snippets from storage. Loading defaults.", true);
+            // Mark error and load defaults on next load
              Office.context.roamingSettings.set(SNIPPETS_KEY + '_error_flag', 'true');
              Office.context.roamingSettings.saveAsync( () => loadDefaultsAndSave());
         }
     } else {
         console.log("No snippets in settings, loading defaults.");
+        // Check if we previously failed, to avoid infinite loop if defaults also fail
          if (Office.context.roamingSettings.get(SNIPPETS_KEY + '_error_flag')) {
              showMessage(listMessage, "Failed to load stored snippets previously. Manual reset might be needed.", true);
-             renderSnippetList([]);
+             renderSnippetList([]); // Show empty list
          } else {
              loadDefaultsAndSave();
          }
@@ -114,7 +118,8 @@ async function loadDefaultsAndSave() {
              renderSnippetList(defaults);
              showMessage(listMessage, "Loaded default snippets.", false);
          } else {
-             renderSnippetList([]);
+             // Error message already shown by saveSnippetsToSettings
+             renderSnippetList([]); // Show empty list if save failed
          }
      });
 }
@@ -123,7 +128,8 @@ async function loadDefaultsAndSave() {
 function saveSnippetsToSettings(snippets, callback) {
     try {
         const snippetsString = JSON.stringify(snippets);
-        if (snippetsString.length > 30000) {
+        // Check size limit (approx 32KB for roaming settings value)
+        if (snippetsString.length > 30000) { // Leave some buffer
              showMessage(listMessage, "Error: Snippets data too large to save.", true);
              if (callback) callback(false);
              return;
@@ -133,7 +139,7 @@ function saveSnippetsToSettings(snippets, callback) {
         Office.context.roamingSettings.saveAsync((asyncResult) => {
             if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
                 console.log("Snippets saved successfully.");
-                 Office.context.roamingSettings.remove(SNIPPETS_KEY + '_error_flag');
+                 Office.context.roamingSettings.remove(SNIPPETS_KEY + '_error_flag'); // Clear error flag on success
                 if (callback) callback(true);
             } else {
                 console.error("Error saving snippets to roaming settings:", asyncResult.error.message);
@@ -148,16 +154,17 @@ function saveSnippetsToSettings(snippets, callback) {
     }
 }
 
-// --- Utility Functions (Unchanged) ---
+// --- Utility Functions ---
 function setMessage(element, htmlContent) {
     if (element) element.innerHTML = htmlContent;
 }
 
 function showMessage(element, message, isError = false) {
-    if (!element) return;
+    if (!element) return; // Check if element exists
     element.textContent = message;
     element.className = `message ${isError ? 'error' : 'success'}`;
     element.classList.remove('hidden');
+    // Auto-hide after a few seconds
     setTimeout(() => {
         element.classList.add('hidden');
         element.textContent = '';
@@ -167,12 +174,12 @@ function showMessage(element, message, isError = false) {
 function clearForm() {
     if (!snippetForm) return;
     snippetForm.reset();
-    if (editOriginalCommandInput) editOriginalCommandInput.value = '';
+    if (editOriginalCommandInput) editOriginalCommandInput.value = ''; // Clear edit tracking
     if (formTitle) formTitle.textContent = 'Create New Snippet';
     if (saveButton) saveButton.textContent = 'Save Snippet';
     if (cancelEditButton) cancelEditButton.classList.add('hidden');
     if (formMessage) formMessage.classList.add('hidden');
-    if (commandInput) commandInput.disabled = false;
+    if (commandInput) commandInput.disabled = false; // Re-enable command input
 }
 
 function extractPlaceholders(text) {
@@ -180,21 +187,25 @@ function extractPlaceholders(text) {
     const regex = /\{([^}]+)\}/g;
     const matches = text.match(regex);
     if (!matches) return [];
+    // Return unique, non-empty placeholder names
     return [...new Set(matches.map(p => p.slice(1, -1).trim()).filter(name => name))];
 }
 
+// --- Text Area Helpers ---
 function insertAtCursor(textarea, textToInsert) {
      if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = textarea.value;
     textarea.value = text.substring(0, start) + textToInsert + text.substring(end);
+    // Place cursor after inserted text
     textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
-    textarea.focus();
+    textarea.focus(); // Keep focus on textarea
+    // Trigger input event in case anything listens for it
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-// --- Snippet List Rendering (MODIFIED) ---
+// --- Snippet List Rendering ---
 function renderSnippetList(snippets) {
     if (!snippetListContainer) return;
     snippetListContainer.innerHTML = ''; // Clear previous list
@@ -220,28 +231,36 @@ function renderSnippetList(snippets) {
             item.className = 'snippet-item';
             item.setAttribute('data-index', index); // Use index for easy lookup
 
+            // Wrapper for flex layout
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'snippet-content-wrapper';
+
             const info = document.createElement('div');
             info.className = 'snippet-info';
             info.innerHTML = `<strong>${snippet.command}</strong><span>${snippet.description || '(No description)'}</span>`;
 
+            // Wrapper for controls (actions and confirm)
+            const controlsWrapper = document.createElement('div');
+            controlsWrapper.className = 'snippet-controls-wrapper';
+
             const actions = document.createElement('div');
-            actions.className = 'snippet-actions';
+            actions.className = 'snippet-actions'; // Container for normal actions
 
             // --- Icon Button Creation ---
             const insertBtn = document.createElement('button');
-            insertBtn.className = 'insert-btn';
+            insertBtn.className = 'action-btn insert-btn'; // Common class for styling/selection
             insertBtn.type = 'button';
             insertBtn.title = 'Insert Snippet';
-            insertBtn.innerHTML = `<span class="material-symbols-outlined">data_object</span>`; // Example icon
+            insertBtn.innerHTML = `<span class="material-symbols-outlined">data_object</span>`; // Or 'add_comment', 'input'
 
             const editBtn = document.createElement('button');
-            editBtn.className = 'edit-btn';
+            editBtn.className = 'action-btn edit-btn';
             editBtn.type = 'button';
             editBtn.title = 'Edit Snippet';
             editBtn.innerHTML = `<span class="material-symbols-outlined">edit</span>`;
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
+            deleteBtn.className = 'action-btn delete-btn';
             deleteBtn.type = 'button';
             deleteBtn.title = 'Delete Snippet';
             deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete</span>`;
@@ -251,12 +270,32 @@ function renderSnippetList(snippets) {
             actions.appendChild(editBtn);
             actions.appendChild(deleteBtn);
 
+            // --- Add Confirmation UI Div (Hidden) ---
+            const confirmDiv = document.createElement('div');
+            confirmDiv.className = 'snippet-confirm-delete hidden'; // Hidden by default
+            confirmDiv.innerHTML = `
+                <span class="confirm-text">Delete snippet?</span>
+                <button type="button" class="confirm-yes-btn" title="Confirm Delete">
+                    <span class="material-symbols-outlined">check</span>
+                </button>
+                <button type="button" class="confirm-no-btn" title="Cancel">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            `;
+            // --- End Confirmation UI Div ---
+
+            controlsWrapper.appendChild(actions);      // Normal actions
+            controlsWrapper.appendChild(confirmDiv);   // Confirmation UI (initially hidden)
+
+            contentWrapper.appendChild(info);          // Add info to main wrapper
+            contentWrapper.appendChild(controlsWrapper); // Add controls block to main wrapper
+
+            // Placeholder for dynamic inputs (below info/actions)
             const placeholderDiv = document.createElement('div');
             placeholderDiv.className = 'placeholder-inputs hidden';
 
-            item.appendChild(info);
-            item.appendChild(actions);
-            item.appendChild(placeholderDiv);
+            item.appendChild(contentWrapper); // Add the content wrapper (info + controls)
+            item.appendChild(placeholderDiv); // Add the placeholder container below
             snippetListContainer.appendChild(item);
         }
     });
@@ -265,10 +304,14 @@ function renderSnippetList(snippets) {
      if (snippetListContainer.children.length === 0 && searchTerm !== '' && snippets.length > 0) {
          setMessage(snippetListContainer, '<p class="status-message">No snippets match your search.</p>');
      }
+     // Show message if list is empty and no search term
+     else if (snippetListContainer.children.length === 0 && searchTerm === '' && snippets.length === 0) {
+          setMessage(snippetListContainer, '<p class="status-message">No snippets found. Create one above!</p>');
+     }
 }
 
 
-// --- Insertion Logic (Unchanged except added null checks) ---
+// --- Insertion Logic ---
 
 function handleInsertClick(event) {
     const itemElement = event.target.closest('.snippet-item');
@@ -291,25 +334,27 @@ function handleInsertClick(event) {
     });
 
     if (placeholders.length > 0) {
+        // Show inputs for placeholders
         showPlaceholderInputs(snippet, placeholderDiv);
     } else {
-        placeholderDiv.classList.add('hidden');
+        // Insert directly
+        placeholderDiv.classList.add('hidden'); // Ensure it's hidden
         insertTextIntoEmail(snippet.text);
     }
 }
 
 function showPlaceholderInputs(snippet, placeholderDiv) {
      if (!placeholderDiv) return;
-    placeholderDiv.innerHTML = '';
+    placeholderDiv.innerHTML = ''; // Clear previous inputs
     placeholderDiv.classList.remove('hidden');
 
     const placeholders = extractPlaceholders(snippet.text);
-    const inputs = {};
+    const inputs = {}; // To store references
 
     placeholders.forEach(name => {
         const label = document.createElement('label');
         label.textContent = `${name}:`;
-        label.htmlFor = `placeholder-input-${snippet.command}-${name}`;
+        label.htmlFor = `placeholder-input-${snippet.command}-${name}`; // Unique ID
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -318,7 +363,7 @@ function showPlaceholderInputs(snippet, placeholderDiv) {
         input.className = 'placeholder-input-field';
         input.placeholder = `Enter value for {${name}}`;
 
-        inputs[name] = input;
+        inputs[name] = input; // Store reference
 
         placeholderDiv.appendChild(label);
         placeholderDiv.appendChild(input);
@@ -327,21 +372,22 @@ function showPlaceholderInputs(snippet, placeholderDiv) {
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Confirm & Insert';
     confirmButton.type = 'button';
-    confirmButton.className = 'confirm-insert-btn';
+    confirmButton.className = 'confirm-insert-btn'; // Uses primary button style
     confirmButton.addEventListener('click', () => handleConfirmInsertClick(snippet, inputs, placeholderDiv));
 
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Cancel';
     cancelButton.type = 'button';
-    cancelButton.className = 'cancel-insert-btn';
+    cancelButton.className = 'cancel-insert-btn'; // Uses secondary button style
      cancelButton.addEventListener('click', () => placeholderDiv.classList.add('hidden'));
 
     const buttonWrapper = document.createElement('div');
     buttonWrapper.className = 'placeholder-button-wrapper';
-    buttonWrapper.appendChild(cancelButton);
-    buttonWrapper.appendChild(confirmButton);
+    buttonWrapper.appendChild(cancelButton); // Cancel first
+    buttonWrapper.appendChild(confirmButton); // Then confirm
     placeholderDiv.appendChild(buttonWrapper);
 
+    // Focus the first input
     const firstInput = placeholderDiv.querySelector('input');
     if (firstInput) firstInput.focus();
 }
@@ -353,20 +399,22 @@ function handleConfirmInsertClick(snippet, inputRefs, placeholderDiv) {
     }
     const compiledText = compileSnippet(snippet, placeholderValues);
     insertTextIntoEmail(compiledText);
-     if (placeholderDiv) placeholderDiv.classList.add('hidden');
+     if (placeholderDiv) placeholderDiv.classList.add('hidden'); // Hide after insertion
 }
 
 function compileSnippet(snippet, placeholderValues) {
     let compiled = snippet.text;
     for (const name in placeholderValues) {
+        // Regex to replace {placeholder_name}, handling potential whitespace
         const regex = new RegExp(`\\{\\s*${escapeRegExp(name)}\\s*\\}`, 'g');
-        compiled = compiled.replace(regex, placeholderValues[name] || '');
+        compiled = compiled.replace(regex, placeholderValues[name] || ''); // Replace with value or empty string
     }
     return compiled;
 }
 
+// Helper function to escape special characters for regex
 function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 function insertTextIntoEmail(text) {
@@ -377,11 +425,12 @@ function insertTextIntoEmail(text) {
         return;
     }
 
+    // Outlook body typically expects HTML. Convert newlines to <br>.
     const htmlText = text.replace(/\n/g, '<br/>');
 
     Office.context.mailbox.item.body.setSelectedDataAsync(
         htmlText,
-        { coercionType: Office.CoercionType.Html },
+        { coercionType: Office.CoercionType.Html }, // Insert as HTML
         (asyncResult) => {
             if (asyncResult.status === Office.AsyncResultStatus.Failed) {
                 console.error(`Error inserting text: ${asyncResult.error.message}`);
@@ -395,7 +444,7 @@ function insertTextIntoEmail(text) {
 }
 
 
-// --- Event Handlers (MODIFIED) ---
+// --- Event Handlers ---
 
 function attachEventListeners() {
      // Ensure elements exist before attaching listeners
@@ -407,7 +456,7 @@ function attachEventListeners() {
             if (!textInput) return;
             const start = textInput.selectionStart;
             insertAtCursor(textInput, '{}');
-            textInput.selectionStart = textInput.selectionEnd = start + 1;
+            textInput.selectionStart = textInput.selectionEnd = start + 1; // Place cursor inside {}
         });
      }
 
@@ -416,6 +465,7 @@ function attachEventListeners() {
     }
 
     if (snippetListContainer) {
+        // Use event delegation for all actions within the list
         snippetListContainer.addEventListener('click', handleListActions);
     }
 
@@ -435,7 +485,7 @@ function attachEventListeners() {
     }
 
     if (searchInput) {
-        searchInput.addEventListener('input', handleSearchInput);
+        searchInput.addEventListener('input', handleSearchInput); // 'input' event for real-time filtering
          // Optional: Clear search on Escape key
          searchInput.addEventListener('keydown', (event) => {
               if (event.key === 'Escape') {
@@ -456,16 +506,14 @@ function handleToggleForm() {
      if (icon) {
           icon.textContent = isHidden ? 'expand_more' : 'expand_less';
      }
-     // If showing form, clear any previous edit state
+     // If showing form, clear any previous edit state only if not already editing
      if (!isHidden) {
-          if (editOriginalCommandInput && editOriginalCommandInput.value !== '') {
-               // Don't clear form if editing, just ensure it's visible
-          } else {
-               clearForm(); // Clear if it was not in edit mode
+          if (editOriginalCommandInput && editOriginalCommandInput.value === '') {
+              clearForm(); // Clear only if not in edit mode
           }
      }
 }
-// Helper to explicitly show/hide form (used in edit/cancel)
+// Helper to explicitly show/hide form (used in edit/cancel/save)
 function toggleFormDisplay(show) {
      if (!formSection || !toggleFormButton) return;
      const isHidden = formSection.classList.contains('hidden');
@@ -489,7 +537,7 @@ function handleSearchInput() {
 }
 
 
-// --- Existing Handlers (modified slightly) ---
+// --- Existing Handlers (modified for new structure/confirm) ---
 function handleFormSubmit(event) {
      event.preventDefault();
      // Ensure elements exist
@@ -568,10 +616,30 @@ function handleListActions(event) {
         return;
     }
 
-    // --- Use button's class list ---
+    // Get references to the action and confirmation divs within this specific item
+    const actionsDiv = snippetItem.querySelector('.snippet-actions');
+    const confirmDiv = snippetItem.querySelector('.snippet-confirm-delete');
+    const confirmTextSpan = confirmDiv ? confirmDiv.querySelector('.confirm-text') : null;
+
+    // --- Hide all other confirmations first ---
+    // Only do this if we are NOT clicking inside a confirmation itself
+     if (!button.classList.contains('confirm-yes-btn') && !button.classList.contains('confirm-no-btn')) {
+          document.querySelectorAll('.snippet-item').forEach(item => {
+               if (item !== snippetItem) { // Don't hide the one we might be opening/interacting with
+                    const otherConfirm = item.querySelector('.snippet-confirm-delete');
+                    const otherActions = item.querySelector('.snippet-actions');
+                    if (otherConfirm) otherConfirm.classList.add('hidden');
+                    if (otherActions) otherActions.classList.remove('hidden'); // Ensure actions are visible
+               }
+          });
+     }
+     // --- ---
+
+    // --- Handle Specific Button Clicks ---
+
     if (button.classList.contains('edit-btn')) {
-        // Populate form for editing
-        if (!formTitle || !commandInput || !descriptionInput || !textInput || !editOriginalCommandInput || !saveButton || !cancelEditButton) return; // Check elements
+        // Edit logic
+        if (!formTitle || !commandInput || !descriptionInput || !textInput || !editOriginalCommandInput || !saveButton || !cancelEditButton) return; // Check elements needed
 
         formTitle.textContent = 'Edit Snippet';
         commandInput.value = snippet.command;
@@ -584,29 +652,53 @@ function handleListActions(event) {
 
         toggleFormDisplay(true); // Ensure form is visible for editing
 
-        window.scrollTo(0, 0);
+        // Ensure correct UI state for the item being edited
+        if (actionsDiv) actionsDiv.classList.remove('hidden');
+        if (confirmDiv) confirmDiv.classList.add('hidden');
+
+        window.scrollTo(0, 0); // Scroll task pane to top
         commandInput.focus();
-        document.querySelectorAll('.placeholder-inputs').forEach(div => div.classList.add('hidden'));
+        document.querySelectorAll('.placeholder-inputs').forEach(div => div.classList.add('hidden')); // Hide placeholder inputs too
     }
     else if (button.classList.contains('delete-btn')) {
-        // Delete Snippet
-        if (confirm(`Are you sure you want to delete the snippet "${snippet.command}"?`)) {
-            let updatedSnippets = currentSnippets.filter((s, i) => i !== snippetIndex);
-            saveSnippetsToSettings(updatedSnippets, (success) => {
-                if (success) {
-                    showMessage(listMessage, "Snippet deleted successfully!", false);
-                    currentSnippets = updatedSnippets;
-                    renderSnippetList(currentSnippets);
-                     if (editOriginalCommandInput && editOriginalCommandInput.value === snippet.command) {
-                         clearForm();
-                         toggleFormDisplay(false); // Hide form if deleted item was being edited
-                     }
-                }
-            });
+        // Show Confirmation UI for *this* item
+        if (actionsDiv) actionsDiv.classList.add('hidden');
+        if (confirmDiv) {
+            if (confirmTextSpan) confirmTextSpan.textContent = `Delete '${snippet.command}'?`; // Update text
+            confirmDiv.classList.remove('hidden');
         }
     }
-     else if (button.classList.contains('insert-btn')) {
-        // Handle Insert Click (delegated from button)
+    else if (button.classList.contains('insert-btn')) {
+        // Handle Insert Click
          handleInsertClick(event); // Pass the original event
-     }
+         // Ensure correct UI state after potential placeholder interaction
+         if (actionsDiv) actionsDiv.classList.remove('hidden');
+         if (confirmDiv) confirmDiv.classList.add('hidden');
+    }
+    else if (button.classList.contains('confirm-yes-btn')) {
+        // Execute Delete
+        console.log("Confirmed delete for:", snippet.command);
+        let updatedSnippets = currentSnippets.filter((s, i) => i !== snippetIndex);
+        saveSnippetsToSettings(updatedSnippets, (success) => {
+            if (success) {
+                showMessage(listMessage, "Snippet deleted successfully!", false);
+                currentSnippets = updatedSnippets; // Update cache *after* successful save
+                renderSnippetList(currentSnippets); // Re-render the list
+                 // If the deleted item was being edited, clear and hide the form
+                 if (editOriginalCommandInput && editOriginalCommandInput.value === snippet.command) {
+                     clearForm();
+                     toggleFormDisplay(false);
+                 }
+            }
+            // Hiding confirmation is now handled by re-rendering the list,
+            // but we could explicitly hide here too if needed before save completes.
+            // if (confirmDiv) confirmDiv.classList.add('hidden');
+            // if (actionsDiv) actionsDiv.classList.remove('hidden');
+        });
+    }
+    else if (button.classList.contains('confirm-no-btn')) {
+        // Cancel Delete - Hide confirmation and show actions
+        if (confirmDiv) confirmDiv.classList.add('hidden');
+        if (actionsDiv) actionsDiv.classList.remove('hidden');
+    }
 }

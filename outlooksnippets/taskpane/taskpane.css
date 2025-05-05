@@ -4,18 +4,18 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif; /* More Office-like font stack */
     font-size: 14px;
-    background-color: #f3f2f1;
-    color: #323130;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
+    background-color: #f3f2f1; /* Office default background */
+    color: #323130; /* Office default text */
+    display: flex; /* Make body a flex container */
+    flex-direction: column; /* Stack children vertically */
+    overflow-y: auto; /* Allow vertical scroll on body if needed */
 }
 
 .container {
     padding: 15px 20px;
-    flex-grow: 1;
+    flex-grow: 1; /* Allow container to fill available space */
     display: flex;
     flex-direction: column;
 }
@@ -23,7 +23,7 @@ html, body {
 .header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #edebe9;
+    border-bottom: 1px solid #edebe9; /* Lighter border */
     padding-bottom: 10px;
     margin-bottom: 15px;
 }
@@ -35,18 +35,19 @@ html, body {
 }
 
 h2, h3 {
-    color: #323130;
+    color: #323130; /* Standard text color */
     margin-top: 10px;
     margin-bottom: 15px;
 }
 h2 { margin-top: 0;}
 h3 { font-size: 1.1em; margin-bottom: 10px;}
 
+
 /* --- Toggle Button --- */
 .toggle-form-button {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center content */
+    /* justify-content: center; /* Remove centering */
     width: 100%;
     padding: 8px 10px;
     margin-bottom: 15px;
@@ -59,6 +60,7 @@ h3 { font-size: 1.1em; margin-bottom: 10px;}
     font-size: 14px;
     color: #323130;
     transition: background-color 0.2s ease;
+    box-sizing: border-box; /* Include padding in width */
 }
 .toggle-form-button:hover {
     background-color: #c8c6c4;
@@ -67,6 +69,7 @@ h3 { font-size: 1.1em; margin-bottom: 10px;}
     margin-right: 8px;
     font-size: 20px;
     transition: transform 0.3s ease; /* Animate icon rotation */
+    vertical-align: middle; /* Align icon vertically */
 }
 /* Icon rotation when form is visible */
 .toggle-form-button.expanded .material-symbols-outlined {
@@ -81,23 +84,22 @@ h3 { font-size: 1.1em; margin-bottom: 10px;}
     background-color: #ffffff;
     border-radius: 2px;
     margin-bottom: 15px; /* Add margin when visible */
-    /* Smooth transition for collapsing/expanding (optional) */
-    /* transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out, border 0.3s ease-out;
+    /* If using transitions for collapse/expand: */
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out, border 0.3s ease-out, margin 0.3s ease-out;
     overflow: hidden;
     max-height: 1000px; /* Set a large max-height for expanded state */
-    /* opacity: 1; */
+    opacity: 1;
 }
 
 /* Styles when hidden */
 .form-section.hidden {
-     display: none;
-    /* For transition: */
-    /* max-height: 0;
+    /* display: none; /* Use transitions instead */
+    max-height: 0;
     padding-top: 0;
     padding-bottom: 0;
     border-width: 0;
     opacity: 0;
-    margin-bottom: 0; */
+    margin-bottom: 0;
 }
 
 
@@ -163,7 +165,7 @@ textarea {
     margin-top: 10px;
 }
 
-/* General Button Styling */
+/* General Button Styling (for text buttons like Save/Cancel) */
 button {
     padding: 8px 16px;
     border: 1px solid transparent;
@@ -171,17 +173,17 @@ button {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    min-width: 80px; /* Keep min-width for text buttons */
+    min-width: 80px;
     text-align: center;
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    vertical-align: middle; /* Align icons and text */
+    vertical-align: middle;
 }
 button:focus {
      outline: 1px solid #323130;
      outline-offset: 2px;
 }
 
-/* Primary Button (Save/Update) */
+/* Primary Button (Save/Update/Confirm Placeholder) */
 button[type="submit"],
 .confirm-insert-btn {
     background-color: #0078d4;
@@ -200,7 +202,7 @@ button[type="submit"]:active,
     border-color: #005a9e;
 }
 
-/* Secondary/Cancel Button */
+/* Secondary/Cancel Button (Form Cancel / Placeholder Cancel) */
 #cancel-edit-button,
 .cancel-insert-btn {
     background-color: #ffffff;
@@ -254,17 +256,17 @@ hr {
 
 /* --- Snippet List Styling --- */
 .list-section {
-     flex-shrink: 0;
+     flex-shrink: 0; /* Prevent list from shrinking too much */
+     min-height: 100px; /* Ensure it has some minimum height */
 }
 #snippet-list-container {
-    /* Removed fixed max-height, let it grow or scroll naturally */
-    /* max-height: 40vh; */
     overflow-y: auto;
     border: 1px solid #edebe9;
     border-radius: 2px;
     padding: 5px;
     background-color: #ffffff;
     margin-bottom: 10px;
+     /* Let height be determined by content or flexbox */
 }
 
 .snippet-item {
@@ -273,26 +275,25 @@ hr {
     border-radius: 2px;
     padding: 10px 15px;
     margin-bottom: 8px;
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Space out info and actions */
-    align-items: flex-start; /* Align items to the top */
-    flex-wrap: wrap; /* Allow wrapping if needed */
+    /* Main layout now inside wrapper */
 }
 .snippet-item:last-child {
     margin-bottom: 0;
 }
+.snippet-item.hidden { display: none; } /* For search */
 
-/* Style for hidden snippet items (search) */
-.snippet-item.hidden {
-    display: none;
+/* Wrapper for flex layout inside item */
+.snippet-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 8px; /* Space before placeholder inputs */
 }
 
-
 .snippet-info {
-    /* margin-right: 15px; */
-    flex-grow: 1; /* Allow info to take up available space */
-    margin-bottom: 8px; /* Space below info on wrap */
-    padding-right: 10px; /* Space before actions */
+    flex-grow: 1;
+    padding-right: 10px;
 }
 
 .snippet-info strong {
@@ -300,62 +301,110 @@ hr {
     font-size: 1.1em;
     display: block;
     margin-bottom: 3px;
+    word-break: break-all; /* Prevent long commands breaking layout */
 }
 
 .snippet-info span {
     font-size: 0.9em;
     color: #605e5c;
+    display: block; /* Ensure description takes own line */
+    word-break: break-word;
+}
+
+/* Wrapper for action buttons and confirm UI */
+.snippet-controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
 }
 
 .snippet-actions {
-    /* text-align: right; No longer needed with flex */
-    display: flex; /* Use flexbox for button alignment */
-    gap: 5px; /* Space between icon buttons */
-    flex-shrink: 0; /* Prevent actions from shrinking */
-    align-items: center; /* Vertically center icons */
-     /* margin-bottom: 8px; */
+    display: flex;
+    gap: 5px;
+    /* margin-bottom: 5px; /* Removed - controlled by wrapper */
+}
+.snippet-actions.hidden {
+    display: none;
 }
 
-/* --- Icon Button Styling --- */
-.snippet-actions button {
-    padding: 5px; /* Smaller padding for icon buttons */
-    font-size: 20px; /* Icon size */
-    margin-left: 0; /* Reset margin */
+
+/* Icon Button Styling (actions + confirm) */
+.action-btn,
+.snippet-confirm-delete button {
+    padding: 5px;
+    font-size: 20px; /* Material Symbol size */
+    margin-left: 0;
     font-weight: normal;
-    background: none; /* Transparent background */
-    border: none; /* No border */
+    background: none;
+    border: none;
     color: #605e5c; /* Default icon color */
-    min-width: auto; /* Allow button to shrink to icon size */
-    line-height: 1; /* Prevent extra space */
-    border-radius: 50%; /* Make it round */
-    width: 32px; /* Fixed width */
-    height: 32px; /* Fixed height */
-    display: inline-flex; /* Use flex for centering icon */
+    min-width: auto;
+    line-height: 1;
+    border-radius: 50%;
+    width: 32px; /* Fixed size circle */
+    height: 32px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
-.snippet-actions button:hover {
-     background-color: #edebe9; /* Light grey background on hover */
-     color: #323130; /* Darker icon on hover */
+.action-btn:hover,
+.snippet-confirm-delete button:hover {
+     background-color: #edebe9; /* Light grey background */
+     color: #323130; /* Darker icon */
+}
+/* Remove blue focus outline for icon buttons if desired */
+.action-btn:focus,
+.snippet-confirm-delete button:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #a19f9d; /* Subtle focus ring */
 }
 
-/* Specific Action Button Colors (Optional) */
-/* .snippet-actions .insert-btn:hover { color: #107c10; } */
-/* .snippet-actions .edit-btn:hover { color: #c85a00; } */ /* Example orange */
-/* .snippet-actions .delete-btn:hover { color: #d83b01; } */
+
+/* --- Confirmation UI Styling --- */
+.snippet-confirm-delete {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px; /* Reduced gap */
+    padding: 3px 5px; /* Reduced padding */
+    background-color: #fff0f0;
+    border: 1px solid #f8c0c7;
+    border-radius: 2px;
+    width: auto;
+    margin-top: 5px; /* Space above confirm UI */
+}
+.snippet-confirm-delete.hidden {
+    display: none;
+}
+.confirm-text {
+    font-size: 0.85em; /* Smaller text */
+    color: #7f2020;
+    margin-right: auto;
+    padding-left: 3px;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+.confirm-yes-btn .material-symbols-outlined {
+     color: #107c10;
+}
+.confirm-no-btn .material-symbols-outlined {
+     color: #a80000;
+}
 
 
 /* Placeholder Input Area */
 .placeholder-inputs {
-    width: 100%; /* Take full width */
-    margin-top: 15px;
-    padding-top: 10px;
+    width: 100%;
+    margin-top: 10px; /* Adjust space */
+    padding: 10px;
     border-top: 1px dashed #c8c6c4;
     background-color: #f8f8f8;
-    padding: 10px;
     border-radius: 2px;
-    box-sizing: border-box; /* Include padding in width */
+    box-sizing: border-box;
 }
+.placeholder-inputs.hidden { display: none; }
 .placeholder-inputs label {
      font-size: 12px;
      margin-right: 5px;
@@ -363,12 +412,11 @@ hr {
      margin-bottom: 3px;
 }
 .placeholder-input-field {
-     width: 100%; /* Full width inside placeholder area */
+     width: 100%;
      padding: 5px;
      margin-bottom: 8px;
      font-size: 13px;
 }
-
 .placeholder-button-wrapper {
     text-align: right;
     margin-top: 10px;
@@ -437,5 +485,11 @@ hr {
   'FILL' 0,
   'wght' 400,
   'GRAD' 0,
-  'opsz' 24
+  'opsz' 20 /* Slightly smaller default size for icons */
+}
+
+/* Adjust icon size within buttons specifically if needed */
+.action-btn .material-symbols-outlined,
+.snippet-confirm-delete button .material-symbols-outlined {
+    font-size: 20px;
 }
