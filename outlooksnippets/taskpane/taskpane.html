@@ -9,6 +9,9 @@
     <!-- Office JavaScript API -->
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
 
+    <!-- Google Fonts - Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
     <!-- Styles -->
     <link rel="stylesheet" href="taskpane.css">
 
@@ -16,15 +19,20 @@
 <body>
     <div class="container">
         <header class="header">
-             <img src="../assets/logo.svg" alt="logo" class="logo"> <!-- Adjusted path -->
+             <img src="../assets/logo.svg" alt="logo" class="logo">
              <h2>Snippet Manager</h2>
         </header>
 
-        <!-- Section for Creating/Editing Snippets -->
-        <div class="form-section">
+        <!-- Toggle Button for Form -->
+        <button type="button" id="toggle-form-btn" class="toggle-form-button" title="Show/Hide New Snippet Form">
+             <span class="material-symbols-outlined">expand_more</span> Create New Snippet
+        </button>
+
+        <!-- Section for Creating/Editing Snippets (Now Collapsible) -->
+        <div class="form-section hidden"> <!-- Start hidden -->
             <h3 id="form-title">Create New Snippet</h3>
             <form id="snippet-form">
-                <input type="hidden" id="edit-original-command" value=""> <!-- For tracking edits -->
+                <input type="hidden" id="edit-original-command" value="">
 
                 <label for="command">Command Name (for reference):</label>
                 <input type="text" id="command" name="command" required placeholder="e.g., welcome_email">
@@ -43,7 +51,7 @@
                     <button type="submit" id="save-button">Save Snippet</button>
                     <button type="button" id="cancel-edit-button" class="hidden">Cancel Edit</button>
                 </div>
-                 <p id="form-message" class="message hidden"></p> <!-- Initially hidden -->
+                 <p id="form-message" class="message hidden"></p>
             </form>
         </div>
 
@@ -52,11 +60,19 @@
         <!-- Section for Listing Existing Snippets -->
         <div class="list-section">
             <h3>Existing Snippets</h3>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                 <input type="search" id="search-snippets" placeholder="Search snippets..." aria-label="Search snippets">
+                 <span class="material-symbols-outlined search-icon">search</span>
+            </div>
+
+
             <div id="snippet-list-container">
                 <p class="status-message">Loading snippets...</p>
                 <!-- Snippets will be loaded here by JS -->
             </div>
-             <p id="list-message" class="message hidden"></p> <!-- Initially hidden -->
+             <p id="list-message" class="message hidden"></p>
         </div>
 
          <footer class="footer">

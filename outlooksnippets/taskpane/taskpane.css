@@ -4,18 +4,18 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif; /* More Office-like font stack */
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
     font-size: 14px;
-    background-color: #f3f2f1; /* Office default background */
-    color: #323130; /* Office default text */
-    display: flex; /* Make body a flex container */
-    flex-direction: column; /* Stack children vertically */
-    overflow-y: auto; /* Allow vertical scroll on body if needed */
+    background-color: #f3f2f1;
+    color: #323130;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
 .container {
     padding: 15px 20px;
-    flex-grow: 1; /* Allow container to fill available space */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
@@ -23,7 +23,7 @@ html, body {
 .header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #edebe9; /* Lighter border */
+    border-bottom: 1px solid #edebe9;
     padding-bottom: 10px;
     margin-bottom: 15px;
 }
@@ -35,48 +35,104 @@ html, body {
 }
 
 h2, h3 {
-    color: #323130; /* Standard text color */
+    color: #323130;
     margin-top: 10px;
     margin-bottom: 15px;
 }
 h2 { margin-top: 0;}
 h3 { font-size: 1.1em; margin-bottom: 10px;}
 
+/* --- Toggle Button --- */
+.toggle-form-button {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content */
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    background-color: #e1dfdd; /* Light grey */
+    border: 1px solid #c8c6c4;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: left; /* Align text left */
+    font-weight: 600;
+    font-size: 14px;
+    color: #323130;
+    transition: background-color 0.2s ease;
+}
+.toggle-form-button:hover {
+    background-color: #c8c6c4;
+}
+.toggle-form-button .material-symbols-outlined {
+    margin-right: 8px;
+    font-size: 20px;
+    transition: transform 0.3s ease; /* Animate icon rotation */
+}
+/* Icon rotation when form is visible */
+.toggle-form-button.expanded .material-symbols-outlined {
+     transform: rotate(180deg);
+}
+
+
+/* --- Form Section --- */
+.form-section {
+    padding: 15px;
+    border: 1px solid #edebe9;
+    background-color: #ffffff;
+    border-radius: 2px;
+    margin-bottom: 15px; /* Add margin when visible */
+    /* Smooth transition for collapsing/expanding (optional) */
+    /* transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out, border 0.3s ease-out;
+    overflow: hidden;
+    max-height: 1000px; /* Set a large max-height for expanded state */
+    /* opacity: 1; */
+}
+
+/* Styles when hidden */
+.form-section.hidden {
+     display: none;
+    /* For transition: */
+    /* max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    opacity: 0;
+    margin-bottom: 0; */
+}
+
 
 label {
     display: block;
     margin-bottom: 5px;
-    font-weight: 600; /* Slightly bolder */
+    font-weight: 600;
     font-size: 13px;
     color: #323130;
 }
 
 input[type="text"],
 textarea {
-    width: calc(100% - 16px); /* Account for padding */
+    width: 100%; /* Use 100% width */
     padding: 8px;
     margin-bottom: 12px;
-    border: 1px solid #c8c6c4; /* Office border color */
-    border-radius: 2px; /* Office-style radius */
-    background-color: #ffffff; /* White background */
+    border: 1px solid #c8c6c4;
+    border-radius: 2px;
+    background-color: #ffffff;
     color: #323130;
     font-size: 14px;
     transition: border-color 0.2s ease;
-    box-sizing: border-box; /* Include padding/border in width */
+    box-sizing: border-box;
 }
 
 input[type="text"]:focus,
 textarea:focus {
     outline: none;
-    border-color: #0078d4; /* Office focus blue */
-    /* Optional: add slight shadow or thicker border */
-    /* box-shadow: 0 0 0 1px #0078d4; */
+    border-color: #0078d4;
 }
 
 textarea {
     resize: vertical;
     min-height: 80px;
-    font-family: "Consolas", "Courier New", monospace; /* Keep monospace for snippets */
+    font-family: "Consolas", "Courier New", monospace;
     white-space: pre;
     overflow: auto;
 }
@@ -109,25 +165,26 @@ textarea {
 
 /* General Button Styling */
 button {
-    padding: 8px 16px; /* Adjusted padding */
+    padding: 8px 16px;
     border: 1px solid transparent;
     border-radius: 2px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 600; /* Bolder */
-    min-width: 80px;
+    font-weight: 600;
+    min-width: 80px; /* Keep min-width for text buttons */
     text-align: center;
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    vertical-align: middle; /* Align icons and text */
 }
 button:focus {
-     outline: 1px solid #323130; /* Simple focus outline */
+     outline: 1px solid #323130;
      outline-offset: 2px;
 }
 
 /* Primary Button (Save/Update) */
 button[type="submit"],
 .confirm-insert-btn {
-    background-color: #0078d4; /* Office blue */
+    background-color: #0078d4;
     color: white;
     border-color: #0078d4;
     margin-left: 8px;
@@ -143,13 +200,12 @@ button[type="submit"]:active,
     border-color: #005a9e;
 }
 
-
 /* Secondary/Cancel Button */
 #cancel-edit-button,
 .cancel-insert-btn {
     background-color: #ffffff;
     color: #323130;
-    border: 1px solid #a19f9d; /* Grey border */
+    border: 1px solid #a19f9d;
 }
 #cancel-edit-button:hover,
 .cancel-insert-btn:hover {
@@ -164,107 +220,150 @@ button[type="submit"]:active,
 
 hr {
     border: none;
-    border-top: 1px solid #edebe9; /* Lighter separator */
+    border-top: 1px solid #edebe9;
     margin: 25px 0;
 }
 
-/* Snippet List Styling */
+/* --- Search Bar --- */
+.search-container {
+    position: relative;
+    margin-bottom: 10px;
+}
+#search-snippets {
+    width: 100%;
+    padding: 8px 10px 8px 35px; /* Add padding for icon */
+    border: 1px solid #c8c6c4;
+    border-radius: 2px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+#search-snippets:focus {
+    outline: none;
+    border-color: #0078d4;
+}
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #605e5c; /* Icon color */
+    font-size: 20px;
+    pointer-events: none; /* Prevent icon from blocking input */
+}
+
+
+/* --- Snippet List Styling --- */
 .list-section {
-     flex-shrink: 0; /* Prevent list from shrinking excessively if form grows */
+     flex-shrink: 0;
 }
 #snippet-list-container {
-    max-height: 40vh; /* Limit height, relative to viewport */
+    /* Removed fixed max-height, let it grow or scroll naturally */
+    /* max-height: 40vh; */
     overflow-y: auto;
     border: 1px solid #edebe9;
     border-radius: 2px;
     padding: 5px;
     background-color: #ffffff;
-    margin-bottom: 10px; /* Space below list */
+    margin-bottom: 10px;
 }
 
 .snippet-item {
     background-color: #ffffff;
-    border: 1px solid #e1dfdd; /* Slightly darker item border */
+    border: 1px solid #e1dfdd;
     border-radius: 2px;
     padding: 10px 15px;
     margin-bottom: 8px;
-    /* display: flex; remove flex for now to allow placeholders below */
-    /* justify-content: space-between; */
-    /* align-items: center; */
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space out info and actions */
+    align-items: flex-start; /* Align items to the top */
+    flex-wrap: wrap; /* Allow wrapping if needed */
 }
 .snippet-item:last-child {
     margin-bottom: 0;
 }
 
-.snippet-info {
-    margin-right: 15px;
-    margin-bottom: 8px; /* Space before actions/placeholders */
+/* Style for hidden snippet items (search) */
+.snippet-item.hidden {
+    display: none;
 }
 
-.snippet-info strong { /* Command */
-    color: #005a9e; /* Darker blue */
+
+.snippet-info {
+    /* margin-right: 15px; */
+    flex-grow: 1; /* Allow info to take up available space */
+    margin-bottom: 8px; /* Space below info on wrap */
+    padding-right: 10px; /* Space before actions */
+}
+
+.snippet-info strong {
+    color: #005a9e;
     font-size: 1.1em;
     display: block;
     margin-bottom: 3px;
 }
 
-.snippet-info span { /* Description */
+.snippet-info span {
     font-size: 0.9em;
-    color: #605e5c; /* Grey */
+    color: #605e5c;
 }
 
 .snippet-actions {
-    text-align: right; /* Align buttons right */
-     margin-bottom: 8px; /* Space below actions if placeholders are shown */
+    /* text-align: right; No longer needed with flex */
+    display: flex; /* Use flexbox for button alignment */
+    gap: 5px; /* Space between icon buttons */
+    flex-shrink: 0; /* Prevent actions from shrinking */
+    align-items: center; /* Vertically center icons */
+     /* margin-bottom: 8px; */
 }
 
+/* --- Icon Button Styling --- */
 .snippet-actions button {
-    padding: 4px 10px;
-    font-size: 12px;
-    margin-left: 5px;
-    font-weight: normal; /* Normal weight for small buttons */
+    padding: 5px; /* Smaller padding for icon buttons */
+    font-size: 20px; /* Icon size */
+    margin-left: 0; /* Reset margin */
+    font-weight: normal;
+    background: none; /* Transparent background */
+    border: none; /* No border */
+    color: #605e5c; /* Default icon color */
+    min-width: auto; /* Allow button to shrink to icon size */
+    line-height: 1; /* Prevent extra space */
+    border-radius: 50%; /* Make it round */
+    width: 32px; /* Fixed width */
+    height: 32px; /* Fixed height */
+    display: inline-flex; /* Use flex for centering icon */
+    align-items: center;
+    justify-content: center;
+}
+.snippet-actions button:hover {
+     background-color: #edebe9; /* Light grey background on hover */
+     color: #323130; /* Darker icon on hover */
 }
 
-/* Specific Action Button Styles */
-.snippet-actions .insert-btn {
-     background-color: #107c10; /* Office Green */
-     color: white;
-     border-color: #107c10;
-}
-.snippet-actions .insert-btn:hover { background-color: #0b6a0b; border-color: #0b6a0b; }
-
-.snippet-actions .edit-btn {
-    background-color: #f3f2f1;
-    color: #323130;
-    border: 1px solid #c8c6c4;
-}
-.snippet-actions .edit-btn:hover { background-color: #edebe9; }
-
-.snippet-actions .delete-btn {
-     background-color: #d83b01; /* Office Red/Orange */
-     color: white;
-     border-color: #d83b01;
-}
-.snippet-actions .delete-btn:hover { background-color: #b83000; border-color: #b83000; }
+/* Specific Action Button Colors (Optional) */
+/* .snippet-actions .insert-btn:hover { color: #107c10; } */
+/* .snippet-actions .edit-btn:hover { color: #c85a00; } */ /* Example orange */
+/* .snippet-actions .delete-btn:hover { color: #d83b01; } */
 
 
 /* Placeholder Input Area */
 .placeholder-inputs {
+    width: 100%; /* Take full width */
     margin-top: 15px;
     padding-top: 10px;
     border-top: 1px dashed #c8c6c4;
-    background-color: #f8f8f8; /* Slightly different background */
+    background-color: #f8f8f8;
     padding: 10px;
     border-radius: 2px;
+    box-sizing: border-box; /* Include padding in width */
 }
 .placeholder-inputs label {
      font-size: 12px;
      margin-right: 5px;
-     display: block; /* Labels on own line */
+     display: block;
      margin-bottom: 3px;
 }
 .placeholder-input-field {
-     width: calc(100% - 12px); /* Adjust width */
+     width: 100%; /* Full width inside placeholder area */
      padding: 5px;
      margin-bottom: 8px;
      font-size: 13px;
@@ -278,17 +377,17 @@ hr {
 
 /* Utility Classes */
 .hidden {
-    display: none !important; /* Use important to override */
+    display: none !important;
 }
 .message {
     font-size: 0.9em;
     margin-top: 10px;
-    padding: 8px 12px; /* More padding */
+    padding: 8px 12px;
     border-radius: 2px;
     border: 1px solid transparent;
     text-align: center;
 }
-.status-message { /* For loading/no snippets */
+.status-message {
     font-size: 0.95em;
     color: #605e5c;
     text-align: center;
@@ -296,13 +395,13 @@ hr {
 }
 
 .message.success {
-    color: #094c09; /* Darker green */
-    background-color: #dff6dd; /* Light green */
+    color: #094c09;
+    background-color: #dff6dd;
     border-color: #a3e5a3;
 }
 .message.error {
-    color: #7f2020; /* Darker red */
-    background-color: #fde7e9; /* Light red */
+    color: #7f2020;
+    background-color: #fde7e9;
     border-color: #f8c0c7;
 }
 .footer {
@@ -310,26 +409,33 @@ hr {
     text-align: center;
     font-size: 0.8em;
     color: #605e5c;
-    flex-shrink: 0; /* Prevent footer from shrinking */
+    flex-shrink: 0;
     padding-top: 10px;
     border-top: 1px solid #edebe9;
 }
 
-/* Scrollbar styling (optional, more subtle) */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-    background: #f3f2f1; /* Match background */
+    background: #f3f2f1;
 }
-
 ::-webkit-scrollbar-thumb {
-    background-color: #c8c6c4; /* Scrollbar handle color */
+    background-color: #c8c6c4;
     border-radius: 4px;
-    border: 2px solid #f3f2f1; /* Create padding */
+    border: 2px solid #f3f2f1;
 }
 ::-webkit-scrollbar-thumb:hover {
      background-color: #a19f9d;
+}
+
+/* Material Symbols Style */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
 }
